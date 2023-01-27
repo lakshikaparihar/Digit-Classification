@@ -14,33 +14,32 @@ Link : http://yann.lecun.com/exdb/mnist/
 
 Logistic Regression (As accuracy is not the criteria we will keep it simple)
 
+### MLOps tool we are using 
+
+MLflow would be used for model repo , artifact storage, versioning and other things in the pipeline
 
 ### Inferencing tool we are using 
 
-We will use docker to infernce our model
-
-### MLOps tool we are using 
-
-MLflow would be used for model repo , versioning and other things in the pipeline
+We will use mlflow dockerfile to inference our model but I have optimized the file to lower the image size. We can use the same file for other models as well. Only need to change a single line thats the reference of the model which we have logged in
 
 
-## How to Run this Project
+## Prerequisites
 
 1. export MLFLOW_TRACKING_URI="sqlite:///mlruns.db"
 2. pip3 install requirements.txt
-3. 
-4. python3 test.py runs:/<run-id>/digi-classification-model
 
 
 ## To Run the UI
 
 > mlflow ui --backend-store-uri sqlite:///mlruns.db
 
-> mlflow models serve -m models:/digit-classification-model/production -p 2000 --env-manager local
+Things you can do in MLflow UI :
+* Register model into production
+* check all the models with versions and other data regarding the model
+* Easily switch between model versions in production
 
-## Cleanup script
+[](https://github.com/lakshikaparihar/Digit-Classification/blob/main/images/mlflow-ui.png)
 
-> rm -rf mlruns*
 
 ## To run the project locally
 
@@ -51,8 +50,13 @@ MLflow would be used for model repo , versioning and other things in the pipelin
 
    It will train you model and  create a pickle file as well also create local sqlite database (mlruns.db) and a artifact folder (mlruns).
 
+3. test the model locally before serving
 
-3. Now you can serve the model using mlflow serve command
+> python3 test.py runs:/<run-id>/digit-classification-model
+
+3. Now you can serve the model through two ways 
+
+    1. using mlflow serve command
 
    ```
    mlflow models serve -m models:/digit-classification-model/production -p 2000 --env-manager local
@@ -61,26 +65,29 @@ MLflow would be used for model repo , versioning and other things in the pipelin
 
    (For linux) export MLFLOW_TRACKING_URI="sqlite:///mlruns.db"
 
-4. Finally you can hit the curl command and get the prediction
+    2. using mlflow optimized docker image
+    
+   > docker pull lakshika1064/ml_models:digitClassificationSklearn
+
+   **Note :**  If you are facing error in pulling the docker image, than you can just build it locally
+
+   > docker build -t lakshika1064/ml_models:digitClassificationSklearn .
+   > docker run -p 2000:8080 lakshika1064/ml_models:digitClassificationSklearn
+
+4. Finally you can hit the curl command either from terminal or postman and get the prediction
 
    ```
-   curl http://127.0.0.1:2000/invocations -H    'Content-Type: application/json' -d '{{"columns": ["age", "sex", "cp", "trtbps", "chol", "fbs", "restecg", "thalachh", "exng", "oldpeak", "slp", "caa", "thall"],"data": [[0.625000, 1.0, 3, 0.716981, 0.369863, 0, 0, 0.671756, 0, 0.032258, 1, 0, 3]]}'
-   ```
-   
-   ```
-   curl http://127.0.0.1:2000/invocations -H    "Content-Type: application/json" -d '{"instances":[   {"age":0.625000, "sex":1, "cp":3, "trtbps":0.716981,    "chol":0.369863, "fbs":0, "restecg":0, "thalachh":0.671756, "exng":0, "oldpeak":0.032258, "slp":1,    "caa":0, "thall":3}]}'
+   curl http://127.0.0.1:2000/invocations -H "Content-Type: application/json" -d '{"instances":[[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,94.0,163.0,99.0,228.0,255.0,202.0,49.0,58.0,47.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,171.0,245.0,253.0,253.0,253.0,254.0,221.0,236.0,174.0,173.0,72.0,136.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,254.0,253.0,253.0,253.0,253.0,208.0,128.0,197.0,250.0,243.0,142.0,123.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,241.0,253.0,253.0,199.0,80.0,35.0,23.0,47.0,87.0,87.0,97.0,110.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,137.0,253.0,253.0,54.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,92.0,255.0,254.0,254.0,119.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,4.0,158.0,254.0,253.0,199.0,4.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,77.0,253.0,254.0,180.0,31.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,3.0,203.0,253.0,254.0,108.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,37.0,253.0,253.0,254.0,43.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,14.0,219.0,254.0,255.0,18.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,199.0,253.0,228.0,62.0,55.0,55.0,55.0,88.0,35.0,55.0,12.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,109.0,253.0,254.0,253.0,253.0,253.0,253.0,254.0,240.0,253.0,186.0,95.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,11.0,215.0,254.0,253.0,253.0,253.0,253.0,254.0,253.0,253.0,253.0,253.0,84.0,2.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,26.0,189.0,253.0,253.0,253.0,253.0,228.0,162.0,207.0,253.0,253.0,254.0,18.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,14.0,85.0,0.0,0.0,0.0,0.0,40.0,207.0,255.0,109.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,89.0,248.0,254.0,56.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,21.0,159.0,245.0,253.0,165.0,3.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,79.0,200.0,230.0,253.0,245.0,137.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,117.0,163.0,194.0,194.0,61.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]]}'
    ```
 
-## Additional Information
+## Cleanup script
 
-* mlflow models build-docker -m "models:/heart-attack-prediction-model/production" -n "heart-attack-prediction"
+> rm -rf mlruns*
 
-* docker run -p 5001:8080 "heart-attack"
-
-#
-#
 
 **Note :** 
 
-*  We have used signature to put validation in my input
 *  We have put the model into production through code but we can do it manually through mlflow ui as well
+*  To create docker image we can also use mlflow docker command :
+> mlflow models build-docker -m "models:/digit-classification-model/production" -n "digit-classification-model"
+* you can get the run-id from the mlrun folder

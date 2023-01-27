@@ -58,7 +58,7 @@ if __name__ == "__main__":
             "digit-classification-model", 
             registered_model_name="digit-classification-model" )
         
-        print("Model Logged into Mlflow Registry")
+        print("Model Logged into Mlflow Registry with run-id: ",model_data.run_id)
 
         # Transition into production
         client = MlflowClient()
