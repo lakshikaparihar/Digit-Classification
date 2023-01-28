@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: digit-classification-model
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: digit-classification-model
+  template:
+    metadata:
+      labels:
+        app: digit-classification-model
+    spec:
+      containers:
+      - name: digit-classification-model
+        image: lakshika1064/aiexchange-jio:disease-model
+        ports:
+        - containerPort: 8080
+        imagePullPolicy: IfNotPresent
